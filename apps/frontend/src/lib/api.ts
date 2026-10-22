@@ -13,7 +13,9 @@ export class ApiError extends Error {
 }
 
 let unauthorizedHandler: (() => void) | null = null;
+let authEpoch = 0;
 export const setUnauthorizedHandler = (fn: (() => void) | null) => { unauthorizedHandler = fn; };
+export const advanceAuthEpoch = () => { authEpoch += 1; };
 
 type Query = Record<string, string | number | boolean | undefined | null>;
 
@@ -30,6 +32,7 @@ function buildUrl(path: string, query?: Query) {
 }
 
 async function request<T>(method: string, path: string, opts: Options = {}): Promise<ApiResult<T>> {
+  const requestAuthEpoch = authEpoch;
   const controller = new AbortController();
   let timedOut = false;
   const timer = setTimeout(() => { timedOut = true; controller.abort(); }, TIMEOUT_MS);
@@ -55,7 +58,7 @@ async function request<T>(method: string, path: string, opts: Options = {}): Pro
   try { json = await res.json(); } catch { /* non-JSON response */ }
 
   if (!res.ok || !json?.success) {
-    if (res.status === 401 && !path.startsWith('/auth/')) unauthorizedHandler?.();
+    if (res.status === 401 && !path.startsWith('/auth/') && requestAuthEpoch === authEpoch) unauthorizedHandler?.();
     throw new ApiError(res.status, json?.message ?? 'Unexpected response from the server.', json?.errors ?? []);
   }
   return { data: json.data as T, meta: json.meta, message: json.message ?? '' };

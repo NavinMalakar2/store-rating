@@ -18,8 +18,9 @@ export function AppLayout() {
   const items = NAV_BY_ROLE[user.role];
 
   const onLogout = async () => {
-    try { await logout(); } catch { toast.error('Could not reach the server, but you have been signed out locally.'); }
+    const logoutRequest = logout();
     navigate('/login', { replace: true });
+    try { await logoutRequest; } catch { toast.error('Could not reach the server, but you have been signed out locally.'); }
   };
 
   const nav = (

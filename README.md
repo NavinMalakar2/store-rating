@@ -128,7 +128,7 @@ All lists take `page` (≥1), `limit` (1–100), `sortOrder` (`asc|desc`) and re
 ## Testing
 
 - **Backend** (94 tests): unit (validation, pagination, rating helpers, RBAC middleware) + integration with Supertest on an isolated PostgreSQL DB (auth, JWT forgery, CSRF, admin CRUD/filters/sorting, rating flows incl. concurrency, DB constraints/triggers, owner isolation).
-- **Frontend** (35 tests): login/signup/password forms, route protection, role-specific navigation, store search, rating submit/modify, error and empty states.
+- **Frontend** (37 tests): login/logout transitions, login/signup/password forms, route protection, role-specific navigation, store search, rating submit/modify, error and empty states.
 - `npm run smoke`: 28 live HTTP checks across the whole stack.
 
 The backend test setup **drops and recreates the `public` schema of `TEST_DATABASE_URL`** and refuses to run unless that database name contains `test`.
